@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Silksong</title>
+  <title>Mini Silksong с героем</title>
   <style>
     body {
       margin: 0;
@@ -23,13 +23,16 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    // Загружаем изображение героя
+    const heroImg = new Image();
+    heroImg.src = "hero.png"; // ваше фото
+
     // Игрок
     const player = {
       x: 50,
       y: 400,
-      width: 40,
-      height: 40,
-      color: "gold",
+      width: 50,
+      height: 80,
       dx: 0,
       dy: 0,
       speed: 4,
@@ -40,7 +43,7 @@
 
     // Платформы
     const platforms = [
-      {x: 0, y: 460, width: 800, height: 40}, // земля
+      {x: 0, y: 460, width: 800, height: 40},
       {x: 200, y: 380, width: 120, height: 20},
       {x: 400, y: 300, width: 150, height: 20},
       {x: 600, y: 200, width: 120, height: 20},
@@ -55,25 +58,19 @@
     document.addEventListener("keyup", e => keys[e.code] = false);
 
     function update() {
-      // Движение влево/вправо
       if (keys["ArrowLeft"]) player.dx = -player.speed;
       else if (keys["ArrowRight"]) player.dx = player.speed;
       else player.dx = 0;
 
-      // Прыжок
       if (keys["Space"] && player.onGround) {
         player.dy = player.jumpPower;
         player.onGround = false;
       }
 
-      // Применяем гравитацию
       player.dy += player.gravity;
-
-      // Движение
       player.x += player.dx;
       player.y += player.dy;
 
-      // Ограничения экрана
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
@@ -98,11 +95,9 @@
           player.y < enemy.y + enemy.height &&
           player.y + player.height > enemy.y) {
         if (player.dy > 0) {
-          // Прыжок сверху убивает врага
           enemy.alive = false;
           player.dy = player.jumpPower / 1.5;
         } else {
-          // Столкновение сбоку = возврат на старт
           player.x = 50;
           player.y = 400;
           player.dx = 0;
@@ -114,9 +109,8 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Игрок
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      // Игрок как картинка
+      ctx.drawImage(heroImg, player.x, player.y, player.width, player.height);
 
       // Платформы
       ctx.fillStyle = "#555";
@@ -135,7 +129,7 @@
       requestAnimationFrame(loop);
     }
 
-    loop();
+    heroImg.onload = () => loop();
   </script>
 </body>
 </html>
