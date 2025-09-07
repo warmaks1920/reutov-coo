@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mini Silksong с героем</title>
   <style>
+    html, body { height: 100%; }
     body {
       margin: 0;
       background: #111;
@@ -25,25 +26,20 @@
 
     // Загружаем изображение героя
     const heroImg = new Image();
-    heroImg.src = "hero.png"; // ваше фото
+    let heroReady = false;
+    heroImg.onload = () => heroReady = true;
+    heroImg.onerror = () => console.warn("hero.png не найден: будет использоваться заглушка");
+    heroImg.src = "hero.png"; // положите файл в эту же папку
 
     // Игрок
     const player = {
-      x: 50,
-      y: 400,
-      width: 50,
-      height: 80,
-      dx: 0,
-      dy: 0,
-      speed: 4,
-      jumpPower: -12,
-      gravity: 0.6,
-      onGround: false
+      x: 50, y: 400, width: 50, height: 80,
+      dx: 0, dy: 0, speed: 4, jumpPower: -12, gravity: 0.6, onGround: false
     };
 
     // Платформы
     const platforms = [
-      {x: 0, y: 460, width: 800, height: 40},
+      {x: 0,   y: 460, width: 800, height: 40},
       {x: 200, y: 380, width: 120, height: 20},
       {x: 400, y: 300, width: 150, height: 20},
       {x: 600, y: 200, width: 120, height: 20},
@@ -52,41 +48,44 @@
     // Враг
     const enemy = {x: 420, y: 260, width: 40, height: 40, alive: true};
 
-    // Управление
+    // Управление (и запрет прокрутки)
     const keys = {};
-    document.addEventListener("keydown", e => keys[e.code] = true);
-    document.addEventListener("keyup", e => keys[e.code] = false);
+    const blockKeys = new Set(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"]);
+    addEventListener("keydown", e => { if (blockKeys.has(e.code)) e.preventDefault(); keys[e.code] = true; });
+    addEventListener("keyup",   e => { if (blockKeys.has(e.code)) e.preventDefault(); keys[e.code] = false; });
 
     function update() {
-      if (keys["ArrowLeft"]) player.dx = -player.speed;
-      else if (keys["ArrowRight"]) player.dx = player.speed;
+      // Горизонтальное движение
+      if (keys["ArrowLeft"])  player.dx = -player.speed;
+      else if (keys["ArrowRight"]) player.dx =  player.speed;
       else player.dx = 0;
 
+      // Прыжок
       if (keys["Space"] && player.onGround) {
         player.dy = player.jumpPower;
         player.onGround = false;
       }
 
+      // Физика
       player.dy += player.gravity;
       player.x += player.dx;
       player.y += player.dy;
 
+      // Границы экрана
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
-      // Столкновения с платформами
+      // Коллизии с платформами (простая проверка "сверху")
       player.onGround = false;
-      platforms.forEach(p => {
-        if (player.x < p.x + p.width &&
-            player.x + player.width > p.x &&
-            player.y + player.height > p.y &&
-            player.y + player.height < p.y + p.height &&
-            player.dy >= 0) {
+      for (const p of platforms) {
+        const hitX = player.x < p.x + p.width && player.x + player.width > p.x;
+        const hitY = player.y + player.height > p.y && player.y + player.height < p.y + p.height;
+        if (hitX && hitY && player.dy >= 0) {
           player.y = p.y - player.height;
           player.dy = 0;
           player.onGround = true;
         }
-      });
+      }
 
       // Столкновение с врагом
       if (enemy.alive &&
@@ -95,13 +94,10 @@
           player.y < enemy.y + enemy.height &&
           player.y + player.height > enemy.y) {
         if (player.dy > 0) {
-          enemy.alive = false;
+          enemy.alive = false;           // прыжок сверху — побеждён
           player.dy = player.jumpPower / 1.5;
-        } else {
-          player.x = 50;
-          player.y = 400;
-          player.dx = 0;
-          player.dy = 0;
+        } else {                          // удар сбоку — респавн
+          Object.assign(player, {x:50, y:400, dx:0, dy:0, onGround:false});
         }
       }
     }
@@ -109,8 +105,16 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Игрок как картинка
-      ctx.drawImage(heroImg, player.x, player.y, player.width, player.height);
+      // Игрок (картинка или заглушка)
+      if (heroReady) {
+        ctx.drawImage(heroImg, player.x, player.y, player.width, player.height);
+      } else {
+        ctx.fillStyle = "gold";
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.fillStyle = "#ddd";
+        ctx.font = "14px Arial";
+        ctx.fillText("hero.png не загружен", 10, 20);
+      }
 
       // Платформы
       ctx.fillStyle = "#555";
@@ -129,8 +133,10 @@
       requestAnimationFrame(loop);
     }
 
-    heroImg.onload = () => loop();
+    // Запускаем игру сразу, без ожидания картинки
+    loop();
   </script>
 </body>
 </html>
+
 
