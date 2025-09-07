@@ -1,318 +1,142 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reutov & Co</title>
+  <meta charset="UTF-8">
+  <title>Mini Silksong</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      background-color: #000;
-      color: white;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 4rem 1rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      font-weight: 300;
-    }
-
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-    }
-
-    .cta-button {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background-color: #e74c3c;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      margin-top: 1rem;
-    }
-
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(231, 76, 54, 0.3);
-    }
-
-    /* Карточки товаров */
-    .products-section {
-      margin-top: 5rem;
-      padding: 2rem 0;
-      background-color: rgba(255, 255, 255, 0.03);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-
-    .products-section h2 {
-      color: white;
-      font-size: 2.5rem;
-      text-align: center;
-      margin-bottom: 2rem;
-      font-weight: 300;
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .product-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
+      margin: 0;
+      background: #111;
       overflow: hidden;
-      transition: transform 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .product-image {
-      height: 300px;
-      background: linear-gradient(45deg, #f8f1f1, #ffe8e8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #333;
-      font-size: 0.9rem;
-      padding: 1rem;
-    }
-
-    .product-info {
-      padding: 1rem;
-    }
-
-    .product-info h3 {
-      color: white;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .product-info p {
-      color: #ccc;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .product-price {
-      color: #e74c3c;
-      font-weight: bold;
-      margin-top: 0.5rem;
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(#333, #000);
     }
   </style>
 </head>
 <body>
-<div style="position: relative; height: 50vh; overflow: hidden;">
-  <!-- YouTube видео как фон -->
- <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" 
-   style="color: rgba(0,0,0,0.01); font-size: 1px; position: fixed; bottom: 0; right: 0;">
-   easter egg
-</a>
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen 
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.7; filter: brightness(1.1);"
-  ></iframe>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-  <!-- Текст поверх видео (стиль как у Solys) -->
-  <div style="position: relative; z-index: 1; text-align: center; color: white; padding-top: 8rem; font-family: 'Helvetica Neue', Arial, sans-serif;">
-    <h1 style="font-size: 2.8rem; font-weight: 300; margin-bottom: 0.5rem;">Reutov & Co</h1>
-    <p style="font-size: 1.1rem; opacity: 0.9; font-weight: 300;">Заказы из-за границы — быстро, надёжно, лично</p>
-  </div>
-</div>
-    <h1>Reutov & Co</h1>
-    <p>Заказы из-за границы — быстро, надёжно, лично</p>
-    <a href="#" class="cta-button">Узнать больше</a>
-  </div>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-  <!-- Популярные товары -->
-  <div class="products-section">
-    <h2>Популярные товары</h2>
-    <div class="products-grid">
-      
-      <!-- Товар 1 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Кружевной боди</div>
-        <div class="product-info">
-          <h3>Кружевной боди</h3>
-          <p>Чёрный, с открытой спиной</p>
-          <p class="product-price">$89</p>
-        </div>
-      </div>
+    // Игрок
+    const player = {
+      x: 50,
+      y: 400,
+      width: 40,
+      height: 40,
+      color: "gold",
+      dx: 0,
+      dy: 0,
+      speed: 4,
+      jumpPower: -12,
+      gravity: 0.6,
+      onGround: false
+    };
 
-      <!-- Товар 2 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Набор белья</div>
-        <div class="product-info">
-          <h3>Набор белья</h3>
-          <p>Розовый, с кружевом</p>
-          <p class="product-price">$75</p>
-        </div>
-      </div>
+    // Платформы
+    const platforms = [
+      {x: 0, y: 460, width: 800, height: 40}, // земля
+      {x: 200, y: 380, width: 120, height: 20},
+      {x: 400, y: 300, width: 150, height: 20},
+      {x: 600, y: 200, width: 120, height: 20},
+    ];
 
-      <!-- Товар 3 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Спортивный бра</div>
-        <div class="product-info">
-          <h3>Спортивный бра</h3>
-          <p>Белый, ультра-лёгкий</p>
-          <p class="product-price">$59</p>
-        </div>
-      </div>
+    // Враг
+    const enemy = {x: 420, y: 260, width: 40, height: 40, alive: true};
 
-      <!-- Товар 4 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Ночной халат</div>
-        <div class="product-info">
-          <h3>Ночной халат</h3>
-          <p>Сатин, розовый</p>
-          <p class="product-price">$120</p>
-        </div>
-      </div>
+    // Управление
+    const keys = {};
+    document.addEventListener("keydown", e => keys[e.code] = true);
+    document.addEventListener("keyup", e => keys[e.code] = false);
 
-      <!-- Товар 5 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Бюстгальтер-балконет</div>
-        <div class="product-info">
-          <h3>Балконет с пуш-ап</h3>
-          <p>Красный, кружевной</p>
-          <p class="product-price">$68</p>
-        </div>
-      </div>
+    function update() {
+      // Движение влево/вправо
+      if (keys["ArrowLeft"]) player.dx = -player.speed;
+      else if (keys["ArrowRight"]) player.dx = player.speed;
+      else player.dx = 0;
 
-      <!-- Товар 6 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Комплект нижнего белья</div>
-        <div class="product-info">
-          <h3>Комплект нижнего белья</h3>
-          <p>Чёрный, с бантиком</p>
-          <p class="product-price">$95</p>
-        </div>
-      </div>
+      // Прыжок
+      if (keys["Space"] && player.onGround) {
+        player.dy = player.jumpPower;
+        player.onGround = false;
+      }
 
-      <!-- Товар 7 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Домашний костюм</div>
-        <div class="product-info">
-          <h3>Домашний костюм</h3>
-          <p>Серый, хлопок</p>
-          <p class="product-price">$85</p>
-        </div>
-      </div>
+      // Применяем гравитацию
+      player.dy += player.gravity;
 
-      <!-- Товар 8 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Бюстгальтер без косточек</div>
-        <div class="product-info">
-          <h3>Без косточек</h3>
-          <p>Бежевый, комфорт</p>
-          <p class="product-price">$49</p>
-        </div>
-      </div>
+      // Движение
+      player.x += player.dx;
+      player.y += player.dy;
 
-      <!-- Товар 9 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Корсет</div>
-        <div class="product-info">
-          <h3>Корсет</h3>
-          <p>Чёрный, с лентами</p>
-          <p class="product-price">$130</p>
-        </div>
-      </div>
+      // Ограничения экрана
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
-      <!-- Товар 10 -->
-      <div class="product-card">
-        <div class="product-image">Изображение: Комплект с трусиками-шортами</div>
-        <div class="product-info">
-          <h3>Комплект с шортами</h3>
-          <p>Белый, летний</p>
-          <p class="product-price">$72</p>
-        </div>
-      </div>
+      // Столкновения с платформами
+      player.onGround = false;
+      platforms.forEach(p => {
+        if (player.x < p.x + p.width &&
+            player.x + player.width > p.x &&
+            player.y + player.height > p.y &&
+            player.y + player.height < p.y + p.height &&
+            player.dy >= 0) {
+          player.y = p.y - player.height;
+          player.dy = 0;
+          player.onGround = true;
+        }
+      });
 
-    </div>
-  </div>
-  <!-- Кнопка "Заказать" -->
-<div style="text-align: center; margin: 5rem auto; padding: 0 1rem;">
-  <button onclick="document.getElementById('orderModal').style.display='flex'" 
-          style="background: #e74c3c; color: white; border: none; padding: 1rem 2rem; 
-                 font-size: 1.1rem; border-radius: 4px; cursor: pointer;">
-    Заказать
-  </button>
-</div>
+      // Столкновение с врагом
+      if (enemy.alive &&
+          player.x < enemy.x + enemy.width &&
+          player.x + player.width > enemy.x &&
+          player.y < enemy.y + enemy.height &&
+          player.y + player.height > enemy.y) {
+        if (player.dy > 0) {
+          // Прыжок сверху убивает врага
+          enemy.alive = false;
+          player.dy = player.jumpPower / 1.5;
+        } else {
+          // Столкновение сбоку = возврат на старт
+          player.x = 50;
+          player.y = 400;
+          player.dx = 0;
+          player.dy = 0;
+        }
+      }
+    }
 
-<!-- Модальное окно -->
-<div id="orderModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                            background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100;">
-  <div style="background: #111; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; color: white;">
-    <h2 style="text-align: center; margin-bottom: 1.5rem;">Оформить заказ</h2>
-    <form action="https://tgform.ru/api/send" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
-      
-      <!-- Скрытое поле: ваш Telegram -->
-      <input type="hidden" name="token" value="groomp2"> <!-- Замените, если другой бот -->
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      <label>
-        Город:
-        <input type="text" name="city" placeholder="Москва" required 
-               style="padding: 0.75rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px;">
-      </label>
+      // Игрок
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
 
-      <label>
-        Адрес:
-        <input type="text" name="address" placeholder="Улица, дом, квартира" required 
-               style="padding: 0.75rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px;">
-      </label>
+      // Платформы
+      ctx.fillStyle = "#555";
+      platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
 
-      <label>
-        Доставка:
-        <select name="delivery" required style="padding: 0.75rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px;">
-          <option value="СДЭК">СДЭК</option>
-          <option value="Почта России">Почта России</option>
-          <option value="Boxberry">Boxberry</option>
-        </select>
-      </label>
+      // Враг
+      if (enemy.alive) {
+        ctx.fillStyle = "crimson";
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      }
+    }
 
-      <label>
-        Телефон или Telegram:
-        <input type="text" name="contact" placeholder="@username или +79991234567" required 
-               style="padding: 0.75rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px;">
-      </label>
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
 
-      <button type="submit" style="background: #e74c3c; color: white; padding: 1rem; border: none; 
-                                  border-radius: 4px; font-size: 1.1rem; margin-top: 1rem; cursor: pointer;">
-        Отправить заявку
-      </button>
-    </form>
-    <button onclick="document.getElementById('orderModal').style.display='none'" 
-            style="background: #555; color: white; border: none; padding: 0.75rem; 
-                   border-radius: 4px; width: 100%; margin-top: 1rem; cursor: pointer;">
-      Закрыть
-    </button>
-  </div>
-</div>
+    loop();
+  </script>
 </body>
 </html>
+
